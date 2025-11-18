@@ -1,0 +1,188 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enumération pour les rôles utilisateur
+enum Role {
+  ADMIN
+  USER
+}
+
+// Enumération pour le statut des projets
+enum ProjectStatus {
+  PLANNING
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+// Enumération pour le statut des tâches
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+}
+
+// Enumération pour la priorité des tâches
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+// Enumération pour le type d'événement
+enum EventType {
+  MEETING
+  DEADLINE
+  REMINDER
+  OTHER
+}
+
+// Enumération pour le statut des rendez-vous
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+// Modèle User - Utilisateurs de l'application
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  managedProjects Project[]     @relation("ProjectManager") // Projets gérés par cet utilisateur
+  assignedTasks   Task[]        @relation("TaskAssignee") // Tâches assignées à cet utilisateur
+  events          Event[]       @relation("UserEvents") // Événements de planning de cet utilisateur
+  appointments    Appointment[] @relation("UserAppointments") // Rendez-vous de cet utilisateur
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+// Modèle Project - Projets de l'entreprise
+model Project {
+  id               String        @id @default(cuid())
+  name             String
+  description      String?       @db.Text
+  status           ProjectStatus @default(PLANNING)
+  startDate        DateTime?
+  endDate          DateTime?
+  projectManagerId String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  // Relations
+  projectManager User   @relation("ProjectManager", fields: [projectManagerId], references: [id], onDelete: Cascade)
+  tasks          Task[] @relation("ProjectTasks")
+
+  @@index([projectManagerId])
+  @@index([status])
+  @@map("projects")
+}
+
+// Modèle Task - Tâches liées aux projets
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String?      @db.Text
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+  dueDate     DateTime?
+  projectId   String
+  assigneeId  String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  project  Project @relation("ProjectTasks", fields: [projectId], references: [id], onDelete: Cascade)
+  assignee User    @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([assigneeId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("tasks")
+}
+
+// Modèle Event - Événements de planning interne
+model Event {
+  id          String    @id @default(cuid())
+  title       String
+  description String?   @db.Text
+  type        EventType @default(OTHER)
+  startDate   DateTime
+  endDate     DateTime
+  userId      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  user User @relation("UserEvents", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([startDate])
+  @@map("events")
+}
+
+// Modèle Client - Clients de l'entreprise
+model Client {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  company      String?
+  address      String?
+  notes        String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  appointments Appointment[] @relation("ClientAppointments")
+
+  @@index([email])
+  @@map("clients")
+}
+
+// Modèle Appointment - Rendez-vous avec les clients
+model Appointment {
+  id          String            @id @default(cuid())
+  title       String
+  description String?           @db.Text
+  status      AppointmentStatus @default(SCHEDULED)
+  startDate   DateTime
+  endDate     DateTime
+  location    String?
+  clientId    String
+  userId      String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  // Relations
+  client Client @relation("ClientAppointments", fields: [clientId], references: [id], onDelete: Cascade)
+  user   User   @relation("UserAppointments", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([userId])
+  @@index([startDate])
+  @@index([status])
+  @@map("appointments")
+}
