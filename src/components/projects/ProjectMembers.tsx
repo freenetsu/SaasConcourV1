@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../../config/api";
 import { useAuth } from "../../context/AuthContext";
-
-const API_URL = "http://localhost:3001/api";
 
 interface Member {
   id: string;

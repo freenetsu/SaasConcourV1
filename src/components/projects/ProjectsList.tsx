@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { API_URL } from "../../config/api";
 import { useAuth } from "../../context/AuthContext";
 import { canCreateProject } from "../../lib/permissions";
 import ProjectCard from "./ProjectCard";
@@ -40,7 +41,7 @@ export default function ProjectsList() {
       setIsLoading(true);
       setError("");
 
-      const response = await fetch("http://localhost:3001/api/projects", {
+      const response = await fetch(`${API_URL}/projects`, {
         headers: {
           "x-user-id": user?.id || "",
         },
@@ -67,7 +68,7 @@ export default function ProjectsList() {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/projects/${id}`, {
+      const response = await fetch(`${API_URL}/projects/${id}`, {
         method: "DELETE",
         headers: {
           "x-user-id": user?.id || "",

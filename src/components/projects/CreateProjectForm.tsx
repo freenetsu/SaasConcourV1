@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { API_URL } from "../../config/api";
 import { useAuth } from "../../context/AuthContext";
 import { canCreateProject } from "../../lib/permissions";
 import Label from "../form/Label";
@@ -79,7 +80,7 @@ export default function CreateProjectForm() {
       setIsLoading(true);
       setError("");
 
-      const response = await fetch("http://localhost:3001/api/projects", {
+      const response = await fetch(`${API_URL}/projects`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import PageMeta from "../../components/common/PageMeta";
+import { API_URL } from "../../config/api";
 import { useAuth } from "../../context/AuthContext";
-
-const API_URL = "http://localhost:3001/api";
 
 interface ProjectManager {
   id: string;

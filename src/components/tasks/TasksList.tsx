@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../../config/api";
 import { useAuth } from "../../context/AuthContext";
 import CreateTaskModal from "./CreateTaskModal";
-
-const API_URL = "http://localhost:3001/api";
 
 interface Task {
   id: string;

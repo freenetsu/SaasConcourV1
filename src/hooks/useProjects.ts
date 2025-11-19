@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Project } from "../api/projects";
+import { API_URL } from "../config/api";
 import { useAuth } from "../context/AuthContext";
-
-const API_URL = "http://localhost:3001/api";
 
 export function useProjects() {
   const [projects, setProjects] = useState<Project[]>([]);

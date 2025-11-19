@@ -4,10 +4,9 @@ import ChatBox from "../../components/chat/ChatBox";
 import PageMeta from "../../components/common/PageMeta";
 import ProjectMembers from "../../components/projects/ProjectMembers";
 import TasksList from "../../components/tasks/TasksList";
+import { API_URL } from "../../config/api";
 import { useAuth } from "../../context/AuthContext";
 import { useProject } from "../../hooks/useProjects";
-
-const API_URL = "http://localhost:3001/api";
 
 // Badge de statut
 const StatusBadge = ({ status }: { status: string }) => {
