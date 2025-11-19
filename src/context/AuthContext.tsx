@@ -11,7 +11,7 @@ interface User {
   id: string;
   email: string;
   name: string;
-  role: "ADMIN" | "USER";
+  role: "ADMIN" | "PROJECT_MANAGER" | "USER";
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }
@@ -21,7 +21,13 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string
+  ) => Promise<void>;
   logout: () => void;
 }
 
@@ -50,63 +56,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      // Nettoyer les espaces
-      const cleanEmail = email.trim().toLowerCase();
-      const cleanPassword = password.trim();
-
-      console.log("Tentative de connexion avec:", cleanEmail);
-
-      // Pour l'instant, on simule une connexion simple
-      // TODO: Remplacer par un vrai appel API
-
-      // Simulation: vérifier avec les données de test
-      const testUsers = [
-        {
-          id: "1",
-          email: "admin@saasconcour.com",
-          password: "password123",
-          name: "Admin Principal",
-          role: "ADMIN" as const,
+      const response = await fetch("http://localhost:3001/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        {
-          id: "2",
-          email: "marie@saasconcour.com",
-          password: "password123",
-          name: "Marie Dupont",
-          role: "USER" as const,
-        },
-        {
-          id: "3",
-          email: "sophie@saasconcour.com",
-          password: "password123",
-          name: "Sophie Bernard",
-          role: "USER" as const,
-        },
-        {
-          id: "4",
-          email: "thomas@saasconcour.com",
-          password: "password123",
-          name: "Thomas Leroy",
-          role: "USER" as const,
-        },
-      ];
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          password: password.trim(),
+        }),
+      });
 
-      const foundUser = testUsers.find(
-        (u) => u.email === cleanEmail && u.password === cleanPassword
-      );
+      const data = await response.json();
 
-      if (!foundUser) {
-        console.log("Utilisateur non trouvé");
-        throw new Error("Email ou mot de passe incorrect");
+      if (!response.ok) {
+        throw new Error(data.error || "Email ou mot de passe incorrect");
       }
 
-      console.log("Utilisateur trouvé:", foundUser.name);
-
+      // Stocker l'utilisateur
       const userData = {
-        id: foundUser.id,
-        email: foundUser.email,
-        name: foundUser.name,
-        role: foundUser.role,
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.name,
+        role: data.user.role,
       };
 
       setUser(userData);
@@ -117,21 +89,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (
+    _name: string,
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string
+  ) => {
     try {
-      // Pour l'instant, on simule une inscription simple
-      // TODO: Remplacer par un vrai appel API
-      console.log("Registering user with password:", password.length, "chars");
+      const response = await fetch("http://localhost:3001/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+        }),
+      });
 
-      const newUser = {
-        id: Date.now().toString(),
-        email,
-        name,
-        role: "USER" as const,
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Erreur lors de l'inscription");
+      }
+
+      // Stocker l'utilisateur
+      const userData = {
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.name,
+        role: data.user.role,
       };
 
-      setUser(newUser);
-      localStorage.setItem("user", JSON.stringify(newUser));
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
     } catch (error) {
       console.error("Register error:", error);
       throw error;

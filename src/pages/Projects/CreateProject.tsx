@@ -1,14 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { createProject } from "../../api/mock-projects";
 import PageMeta from "../../components/common/PageMeta";
 import { useAuth } from "../../context/AuthContext";
+
+const API_URL = "http://localhost:3001/api";
+
+interface ProjectManager {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
 
 export default function CreateProject() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [projectManagers, setProjectManagers] = useState<ProjectManager[]>([]);
+  const [loadingManagers, setLoadingManagers] = useState(true);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -20,19 +30,62 @@ export default function CreateProject() {
     projectManagerId: user?.id || "",
   });
 
+  // Charger les PROJECT_MANAGER
+  useEffect(() => {
+    const fetchProjectManagers = async () => {
+      try {
+        setLoadingManagers(true);
+        const response = await fetch(`${API_URL}/users/project-managers`, {
+          headers: {
+            "x-user-id": user?.id || "",
+          },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Erreur lors du chargement");
+        }
+
+        setProjectManagers(data.users || []);
+      } catch (err) {
+        console.error("Error fetching project managers:", err);
+      } finally {
+        setLoadingManagers(false);
+      }
+    };
+
+    if (user?.role === "ADMIN") {
+      fetchProjectManagers();
+    }
+  }, [user]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
-      // Créer le projet via l'API mockée
-      await createProject(formData);
+      const response = await fetch(`${API_URL}/projects`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id || "",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Erreur lors de la création du projet");
+      }
 
       // Rediriger vers la liste des projets
       navigate("/projects");
-    } catch {
-      setError("Erreur lors de la création du projet");
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || "Erreur lors de la création du projet");
     } finally {
       setIsLoading(false);
     }
@@ -58,10 +111,7 @@ export default function CreateProject() {
           <p className="mb-4 text-gray-600 dark:text-gray-400">
             Seuls les administrateurs peuvent créer des projets.
           </p>
-          <Link
-            to="/projects"
-            className="text-brand-500 hover:text-brand-600"
-          >
+          <Link to="/projects" className="text-brand-500 hover:text-brand-600">
             Retour aux projets
           </Link>
         </div>
@@ -234,14 +284,19 @@ export default function CreateProject() {
                     value={formData.projectManagerId}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg dark:border-gray-800 dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    disabled={loadingManagers}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg dark:border-gray-800 dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-50"
                   >
-                    <option value="">Sélectionner un chef de projet</option>
-                    <option value="2">Marie Dupont</option>
-                    <option value="3">Sophie Bernard</option>
-                    <option value="4">Thomas Leroy</option>
-                    <option value="5">Lucas Petit</option>
-                    <option value="6">Emma Dubois</option>
+                    <option value="">
+                      {loadingManagers
+                        ? "Chargement..."
+                        : "Sélectionner un chef de projet"}
+                    </option>
+                    {projectManagers.map((pm) => (
+                      <option key={pm.id} value={pm.id}>
+                        {pm.name} - {pm.role}
+                      </option>
+                    ))}
                   </select>
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     Le chef de projet sera responsable de la gestion de ce

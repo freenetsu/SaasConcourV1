@@ -42,8 +42,19 @@ const Calendar: React.FC = () => {
   const [allDay, setAllDay] = useState(false);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const calendarRef = useRef<FullCalendar>(null);
   const { isOpen, openModal, closeModal } = useModal();
+
+  // Détecter si on est sur mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Charger les événements de l'utilisateur
   useEffect(() => {
@@ -240,12 +251,21 @@ const Calendar: React.FC = () => {
           <FullCalendar
             ref={calendarRef}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            initialView="timeGridWeek"
+            initialView={isMobile ? "timeGridDay" : "timeGridWeek"}
             headerToolbar={{
-              left: "prev,next today",
+              left: "prev,next",
               center: "title",
-              right: "addEventButton,dayGridMonth,timeGridWeek,timeGridDay",
+              right: isMobile
+                ? "today"
+                : "addEventButton,timeGridDay,timeGridWeek,dayGridMonth",
             }}
+            footerToolbar={
+              isMobile
+                ? {
+                    center: "addEventButton",
+                  }
+                : undefined
+            }
             slotMinTime="08:00:00"
             slotMaxTime="19:00:00"
             slotDuration="00:30:00"
@@ -254,13 +274,49 @@ const Calendar: React.FC = () => {
             weekends={true}
             nowIndicator={true}
             locale="fr"
-            eventMinHeight={30}
-            eventShortHeight={30}
+            height={isMobile ? "auto" : "auto"}
+            contentHeight={isMobile ? 600 : "auto"}
+            aspectRatio={isMobile ? 1 : 1.8}
+            eventMinHeight={isMobile ? 25 : 30}
+            eventShortHeight={isMobile ? 25 : 30}
+            slotLabelFormat={{
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }}
+            dayHeaderFormat={
+              isMobile
+                ? {
+                    weekday: "short",
+                    day: "numeric",
+                  }
+                : {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "numeric",
+                  }
+            }
             buttonText={{
-              today: "Aujourd'hui",
+              today: isMobile ? "Auj." : "Aujourd'hui",
               month: "Mois",
               week: "Semaine",
               day: "Jour",
+            }}
+            views={{
+              timeGridWeek: {
+                dayHeaderFormat: isMobile
+                  ? {
+                      weekday: "narrow",
+                      day: "numeric",
+                    }
+                  : {
+                      weekday: "short",
+                      day: "numeric",
+                    },
+              },
+              timeGridDay: {
+                titleFormat: { year: "numeric", month: "long", day: "numeric" },
+              },
             }}
             events={events}
             selectable={true}
@@ -290,10 +346,10 @@ const Calendar: React.FC = () => {
         >
           <div className="flex overflow-y-auto flex-col px-2 custom-scrollbar max-h-[calc(90vh-2rem)]">
             <div>
-              <h5 className="mb-2 font-semibold text-gray-800 modal-title text-lg sm:text-xl dark:text-white/90 lg:text-2xl">
+              <h5 className="mb-2 text-lg font-semibold text-gray-800 modal-title sm:text-xl dark:text-white/90 lg:text-2xl">
                 {selectedEvent ? "Modifier l'événement" : "Nouvel événement"}
               </h5>
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-500 sm:text-sm dark:text-gray-400">
                 Organisez votre emploi du temps et planifiez vos activités
               </p>
             </div>
@@ -348,7 +404,7 @@ const Calendar: React.FC = () => {
                       <span className="text-base sm:text-xl">
                         {config.icon}
                       </span>
-                      <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <span className="text-xs font-medium text-gray-700 sm:text-sm dark:text-gray-300">
                         {config.label}
                       </span>
                     </button>
@@ -376,7 +432,7 @@ const Calendar: React.FC = () => {
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Début <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <input
                     id="event-start-date"
                     type="date"
@@ -403,7 +459,7 @@ const Calendar: React.FC = () => {
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Fin <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <input
                     id="event-end-date"
                     type="date"
@@ -425,7 +481,7 @@ const Calendar: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center mt-6 modal-footer sm:justify-end">
+            <div className="flex flex-col gap-2 items-stretch mt-6 sm:flex-row sm:gap-3 sm:items-center modal-footer sm:justify-end">
               {selectedEvent && (
                 <button
                   onClick={handleDeleteEvent}

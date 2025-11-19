@@ -1,9 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { updateProject } from "../../api/mock-projects";
 import PageMeta from "../../components/common/PageMeta";
 import { useAuth } from "../../context/AuthContext";
 import { useProject } from "../../hooks/useProjects";
+
+const API_URL = "http://localhost:3001/api";
+
+interface ProjectManager {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
 
 export default function EditProject() {
   const { id } = useParams<{ id: string }>();
@@ -12,6 +20,8 @@ export default function EditProject() {
   const { project, loading } = useProject(id || "");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [projectManagers, setProjectManagers] = useState<ProjectManager[]>([]);
+  const [loadingManagers, setLoadingManagers] = useState(true);
 
   // Form state
   const [formData, setFormData] = useState<{
@@ -29,6 +39,38 @@ export default function EditProject() {
     endDate: "",
     projectManagerId: "",
   });
+
+  // Charger les PROJECT_MANAGER (pour ADMIN uniquement)
+  useEffect(() => {
+    const fetchProjectManagers = async () => {
+      try {
+        setLoadingManagers(true);
+        const response = await fetch(`${API_URL}/users/project-managers`, {
+          headers: {
+            "x-user-id": user?.id || "",
+          },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Erreur lors du chargement");
+        }
+
+        setProjectManagers(data.users || []);
+      } catch (err) {
+        console.error("Error fetching project managers:", err);
+      } finally {
+        setLoadingManagers(false);
+      }
+    };
+
+    if (user?.role === "ADMIN") {
+      fetchProjectManagers();
+    } else {
+      setLoadingManagers(false);
+    }
+  }, [user]);
 
   // Charger les données du projet
   useEffect(() => {
@@ -59,13 +101,40 @@ export default function EditProject() {
     setIsLoading(true);
 
     try {
-      // Mettre à jour le projet
-      await updateProject(id || "", formData);
+      // Si PROJECT_MANAGER, ne pas envoyer projectManagerId
+      const dataToSend =
+        user?.role === "ADMIN"
+          ? formData
+          : {
+              name: formData.name,
+              description: formData.description,
+              status: formData.status,
+              startDate: formData.startDate,
+              endDate: formData.endDate,
+            };
+
+      const response = await fetch(`${API_URL}/projects/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id || "",
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Erreur lors de la modification du projet"
+        );
+      }
 
       // Rediriger vers le détail du projet
       navigate(`/projects/${id}`);
-    } catch {
-      setError("Erreur lors de la modification du projet");
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || "Erreur lors de la modification du projet");
     } finally {
       setIsLoading(false);
     }
@@ -266,7 +335,7 @@ export default function EditProject() {
                   </div>
                 </div>
 
-                {/* Chef de projet */}
+                {/* Chef de projet - Modifiable uniquement par ADMIN */}
                 <div>
                   <label
                     htmlFor="projectManagerId"
@@ -274,21 +343,35 @@ export default function EditProject() {
                   >
                     Chef de projet <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    id="projectManagerId"
-                    name="projectManagerId"
-                    value={formData.projectManagerId}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg dark:border-gray-800 dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  >
-                    <option value="">Sélectionner un chef de projet</option>
-                    <option value="2">Marie Dupont</option>
-                    <option value="3">Sophie Bernard</option>
-                    <option value="4">Thomas Leroy</option>
-                    <option value="5">Lucas Petit</option>
-                    <option value="6">Emma Dubois</option>
-                  </select>
+                  {isAdmin ? (
+                    <select
+                      id="projectManagerId"
+                      name="projectManagerId"
+                      value={formData.projectManagerId}
+                      onChange={handleChange}
+                      required
+                      disabled={loadingManagers}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg dark:border-gray-800 dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-50"
+                    >
+                      <option value="">
+                        {loadingManagers
+                          ? "Chargement..."
+                          : "Sélectionner un chef de projet"}
+                      </option>
+                      {projectManagers.map((pm) => (
+                        <option key={pm.id} value={pm.id}>
+                          {pm.name} - {pm.role}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 dark:border-gray-800 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+                      {project?.projectManager?.name || "Non défini"}
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                        Seul un administrateur peut modifier le chef de projet
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

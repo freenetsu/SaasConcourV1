@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { deleteProject, getProjectStats } from "../../api/mock-projects";
 import ChatBox from "../../components/chat/ChatBox";
 import PageMeta from "../../components/common/PageMeta";
+import ProjectMembers from "../../components/projects/ProjectMembers";
+import TasksList from "../../components/tasks/TasksList";
 import { useAuth } from "../../context/AuthContext";
 import { useProject } from "../../hooks/useProjects";
+
+const API_URL = "http://localhost:3001/api";
 
 // Badge de statut
 const StatusBadge = ({ status }: { status: string }) => {
@@ -45,76 +48,6 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
-// Badge de priorité
-const PriorityBadge = ({ priority }: { priority: string }) => {
-  const priorityConfig = {
-    LOW: {
-      label: "Basse",
-      color: "bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400",
-    },
-    MEDIUM: {
-      label: "Moyenne",
-      color: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
-    },
-    HIGH: {
-      label: "Haute",
-      color:
-        "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
-    },
-    URGENT: {
-      label: "Urgente",
-      color: "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
-    },
-  };
-
-  const config =
-    priorityConfig[priority as keyof typeof priorityConfig] ||
-    priorityConfig.MEDIUM;
-
-  return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${config.color}`}
-    >
-      {config.label}
-    </span>
-  );
-};
-
-// Badge de statut de tâche
-const TaskStatusBadge = ({ status }: { status: string }) => {
-  const statusConfig = {
-    TODO: {
-      label: "À faire",
-      color: "bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400",
-    },
-    IN_PROGRESS: {
-      label: "En cours",
-      color: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
-    },
-    REVIEW: {
-      label: "En revue",
-      color:
-        "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
-    },
-    DONE: {
-      label: "Terminé",
-      color:
-        "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
-    },
-  };
-
-  const config =
-    statusConfig[status as keyof typeof statusConfig] || statusConfig.TODO;
-
-  return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${config.color}`}
-    >
-      {config.label}
-    </span>
-  );
-};
-
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -128,9 +61,7 @@ export default function ProjectDetail() {
     done: number;
     progress: number;
   } | null>(null);
-  const [activeTab, setActiveTab] = useState<"tasks" | "members" | "chat">(
-    "tasks"
-  );
+  const [activeTab, setActiveTab] = useState<"tasks" | "chat">("tasks");
 
   useEffect(() => {
     if (project?.id) {
@@ -168,36 +99,6 @@ export default function ProjectDetail() {
       </div>
     );
   }
-
-  // Récupérer tous les membres uniques du projet
-  const projectMembers = new Map();
-
-  // Ajouter le chef de projet
-  if (project.projectManager) {
-    projectMembers.set(project.projectManager.id, {
-      ...project.projectManager,
-      role: "Chef de projet",
-      tasksCount: 0,
-    });
-  }
-
-  // Ajouter les membres assignés aux tâches
-  project.tasks?.forEach((task) => {
-    if (task.assignee) {
-      const existing = projectMembers.get(task.assignee.id);
-      if (existing) {
-        existing.tasksCount += 1;
-      } else {
-        projectMembers.set(task.assignee.id, {
-          ...task.assignee,
-          role: "Membre",
-          tasksCount: 1,
-        });
-      }
-    }
-  });
-
-  const members = Array.from(projectMembers.values());
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("fr-FR", {
@@ -445,34 +346,10 @@ export default function ProjectDetail() {
 
           {/* Membres du projet */}
           <div className="p-4 sm:p-6 bg-white rounded-xl border border-gray-200 lg:col-span-2 dark:bg-gray-900 dark:border-gray-800">
-            <h3 className="mb-4 text-sm font-medium text-gray-500 uppercase dark:text-gray-400">
-              Membres de l'équipe ({members.length})
-            </h3>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {members.map((member) => (
-                <div
-                  key={member.id}
-                  className="p-3 sm:p-4 bg-white rounded-lg border border-gray-200 dark:bg-gray-900 dark:border-gray-800"
-                >
-                  <div className="flex gap-3 items-center mb-2">
-                    <div className="flex flex-shrink-0 justify-center items-center w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/20">
-                      <span className="text-sm font-medium text-brand-600 dark:text-brand-400">
-                        {member.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                        {member.name}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {member.role} • {member.tasksCount} tâche
-                        {member.tasksCount > 1 ? "s" : ""}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ProjectMembers
+              projectId={project.id}
+              projectManagerId={project.projectManagerId}
+            />
           </div>
         </div>
 
@@ -490,16 +367,6 @@ export default function ProjectDetail() {
               Tâches ({project.tasks?.length || 0})
             </button>
             <button
-              onClick={() => setActiveTab("members")}
-              className={`pb-3 sm:pb-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                activeTab === "members"
-                  ? "border-brand-500 text-brand-600 dark:text-brand-400"
-                  : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-              }`}
-            >
-              Membres ({members.length})
-            </button>
-            <button
               onClick={() => setActiveTab("chat")}
               className={`pb-3 sm:pb-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "chat"
@@ -512,115 +379,13 @@ export default function ProjectDetail() {
           </nav>
         </div>
 
-        {/* Content */}
+        {/* Contenu des tabs */}
         {activeTab === "tasks" ? (
-          <div className="space-y-3">
-            {canEdit && (
-              <button className="p-4 w-full text-sm font-medium rounded-lg border-2 border-dashed text-brand-600 border-brand-300 hover:bg-brand-50 dark:border-brand-800 dark:text-brand-400 dark:hover:bg-brand-900/20">
-                + Ajouter une tâche
-              </button>
-            )}
-
-            {project.tasks && project.tasks.length > 0 ? (
-              project.tasks.map((task) => (
-                <div
-                  key={task.id}
-                  className="p-3 sm:p-4 bg-white rounded-lg border border-gray-200 dark:bg-gray-900 dark:border-gray-800"
-                >
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
-                    <div className="flex-1">
-                      <h4 className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">
-                        {task.title}
-                      </h4>
-                      {task.description && (
-                        <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                          {task.description}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      <TaskStatusBadge status={task.status} />
-                      <PriorityBadge priority={task.priority} />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 sm:gap-4 items-center mt-3 text-xs sm:text-sm">
-                    {task.assignee && (
-                      <div className="flex gap-2 items-center">
-                        <div className="flex justify-center items-center w-6 h-6 rounded-full bg-brand-100 dark:bg-brand-900/20">
-                          <span className="text-xs font-medium text-brand-600 dark:text-brand-400">
-                            {task.assignee.name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <span className="text-gray-600 dark:text-gray-400">
-                          {task.assignee.name}
-                        </span>
-                      </div>
-                    )}
-                    {task.dueDate && (
-                      <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        {formatDate(task.dueDate)}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="py-12 text-center">
-                <p className="text-gray-600 dark:text-gray-400">
-                  Aucune tâche pour ce projet
-                </p>
-              </div>
-            )}
-          </div>
-        ) : activeTab === "members" ? (
-          <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {members.map((member) => (
-              <div
-                key={member.id}
-                className="p-4 sm:p-6 bg-white rounded-lg border border-gray-200 dark:bg-gray-900 dark:border-gray-800"
-              >
-                <div className="flex gap-4 items-center mb-4">
-                  <div className="flex flex-shrink-0 justify-center items-center w-12 h-12 rounded-full bg-brand-100 dark:bg-brand-900/20">
-                    <span className="text-lg font-medium text-brand-600 dark:text-brand-400">
-                      {member.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 truncate dark:text-white">
-                      {member.name}
-                    </h4>
-                    <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                      {member.email}
-                    </p>
-                  </div>
-                </div>
-                <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">
-                      {member.role}
-                    </span>
-                    <span className="font-medium text-gray-900 dark:text-white">
-                      {member.tasksCount} tâche
-                      {member.tasksCount > 1 ? "s" : ""}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div>
+            <TasksList
+              projectId={project.id}
+              projectManagerId={project.projectManagerId}
+            />
           </div>
         ) : (
           <ChatBox projectId={id || ""} />

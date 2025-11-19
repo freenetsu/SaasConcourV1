@@ -686,6 +686,65 @@ span.flatpickr-weekday,
     font-size: 11px;
 }
 
+
+/* Styles responsive pour mobile */
+
+@media (max-width: 768px) {
+    .custom-calendar .fc-toolbar {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem;
+    }
+    .custom-calendar .fc-toolbar-chunk {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+    .custom-calendar .fc-toolbar-title {
+        font-size: 1rem !important;
+        line-height: 1.5rem;
+    }
+    .custom-calendar .fc-button {
+        padding: 0.375rem 0.75rem !important;
+        font-size: 0.75rem !important;
+    }
+    .custom-calendar .fc-col-header-cell {
+        padding: 4px 2px !important;
+        font-size: 0.75rem !important;
+    }
+    .custom-calendar .fc-timegrid-axis {
+        font-size: 0.625rem !important;
+        width: 35px !important;
+    }
+    .custom-calendar .fc-timegrid-slot-label {
+        font-size: 0.625rem !important;
+    }
+    .custom-calendar .fc-timegrid-slot {
+        height: 2em !important;
+    }
+    .custom-calendar .fc-scrollgrid {
+        border-width: 1px !important;
+    }
+    .custom-calendar .fc-event {
+        font-size: 0.625rem !important;
+    }
+    .custom-calendar .fc-daygrid-day-number {
+        font-size: 0.75rem !important;
+    }
+    /* Améliorer l'affichage du footer sur mobile */
+    .custom-calendar .fc-footer-toolbar {
+        padding: 0.5rem;
+    }
+    /* Réduire les marges entre les colonnes */
+    .custom-calendar .fc-timegrid-col {
+        min-width: 0 !important;
+    }
+    /* Améliorer l'affichage des événements sur mobile */
+    .custom-calendar .fc-timegrid-event-harness {
+        margin-right: 1px !important;
+    }
+}
+
 .fc.fc-media-screen {
     @apply min-h-screen;
 }

@@ -41,7 +41,7 @@ async function main() {
       email: "marie@saasconcour.com",
       name: "Marie Dupont",
       password: hashedPassword,
-      role: Role.USER,
+      role: Role.PROJECT_MANAGER,
     },
   });
 
@@ -59,7 +59,7 @@ async function main() {
       email: "thomas@saasconcour.com",
       name: "Thomas Leroy",
       password: hashedPassword,
-      role: Role.USER,
+      role: Role.PROJECT_MANAGER,
     },
   });
 

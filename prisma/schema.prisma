@@ -13,6 +13,7 @@ datasource db {
 // Enumération pour les rôles utilisateur
 enum Role {
   ADMIN
+  PROJECT_MANAGER
   USER
 }
 
@@ -69,6 +70,7 @@ model User {
 
   // Relations
   managedProjects Project[]     @relation("ProjectManager") // Projets gérés par cet utilisateur
+  memberProjects  Project[]     @relation("ProjectMembers") // Projets dont cet utilisateur est membre
   assignedTasks   Task[]        @relation("TaskAssignee") // Tâches assignées à cet utilisateur
   events          Event[]       @relation("UserEvents") // Événements de planning de cet utilisateur
   appointments    Appointment[] @relation("UserAppointments") // Rendez-vous de cet utilisateur
@@ -92,6 +94,7 @@ model Project {
 
   // Relations
   projectManager User   @relation("ProjectManager", fields: [projectManagerId], references: [id], onDelete: Cascade)
+  members        User[] @relation("ProjectMembers") // Membres du projet
   tasks          Task[] @relation("ProjectTasks")
 
   @@index([projectManagerId])
