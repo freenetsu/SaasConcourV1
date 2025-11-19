@@ -20,19 +20,25 @@ const getUserRole = async (userId: string) => {
 // GET /api/users/project-managers - Liste des PROJECT_MANAGER (pour ADMIN)
 router.get("/project-managers", async (req: Request, res: Response) => {
   try {
+    console.log("🔍 GET /api/users/project-managers");
     const userId = getUserFromRequest(req);
+    console.log("👤 User ID:", userId);
 
     if (!userId) {
+      console.log("❌ No user ID");
       return res.status(401).json({ error: "Non authentifié" });
     }
 
     const userRole = await getUserRole(userId);
+    console.log("🎭 User role:", userRole);
 
     // Seul ADMIN peut voir la liste des PROJECT_MANAGER
     if (userRole !== "ADMIN") {
+      console.log("❌ User is not ADMIN");
       return res.status(403).json({ error: "Accès refusé" });
     }
 
+    console.log("📋 Fetching project managers...");
     const projectManagers = await prisma.user.findMany({
       where: {
         OR: [{ role: "PROJECT_MANAGER" }, { role: "ADMIN" }],
@@ -48,9 +54,10 @@ router.get("/project-managers", async (req: Request, res: Response) => {
       },
     });
 
+    console.log(`✅ Found ${projectManagers.length} managers`);
     res.json({ users: projectManagers });
   } catch (error) {
-    console.error("Get project managers error:", error);
+    console.error("❌ Get project managers error:", error);
     res
       .status(500)
       .json({ error: "Erreur lors de la récupération des chefs de projet" });

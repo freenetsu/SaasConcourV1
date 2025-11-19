@@ -34,6 +34,12 @@ export default function CreateProject() {
     const fetchProjectManagers = async () => {
       try {
         setLoadingManagers(true);
+        console.log("🔍 Fetching project managers...", {
+          url: `${API_URL}/users/project-managers`,
+          userId: user?.id,
+          userRole: user?.role,
+        });
+
         const response = await fetch(`${API_URL}/users/project-managers`, {
           headers: {
             "x-user-id": user?.id || "",
@@ -41,21 +47,26 @@ export default function CreateProject() {
         });
 
         const data = await response.json();
+        console.log("📦 Response:", { status: response.status, data });
 
         if (!response.ok) {
           throw new Error(data.error || "Erreur lors du chargement");
         }
 
         setProjectManagers(data.users || []);
+        console.log("✅ Project managers loaded:", data.users?.length || 0);
       } catch (err) {
-        console.error("Error fetching project managers:", err);
+        console.error("❌ Error fetching project managers:", err);
       } finally {
         setLoadingManagers(false);
       }
     };
 
     if (user?.role === "ADMIN") {
+      console.log("👤 User is ADMIN, fetching managers...");
       fetchProjectManagers();
+    } else {
+      console.log("⚠️ User is not ADMIN:", user?.role);
     }
   }, [user]);
 
