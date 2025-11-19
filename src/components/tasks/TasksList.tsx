@@ -282,7 +282,6 @@ export default function TasksList({
       {showCreateModal && (
         <CreateTaskModal
           projectId={projectId}
-          projectManagerId={projectManagerId}
           onClose={() => setShowCreateModal(false)}
           onTaskCreated={fetchTasks}
         />

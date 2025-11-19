@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { API_URL } from "../../config/api";
 import { useAuth } from "../../context/AuthContext";
 
@@ -10,14 +10,12 @@ interface Member {
 
 interface CreateTaskModalProps {
   projectId: string;
-  projectManagerId: string;
   onClose: () => void;
   onTaskCreated: () => void;
 }
 
 export default function CreateTaskModal({
   projectId,
-  projectManagerId,
   onClose,
   onTaskCreated,
 }: CreateTaskModalProps) {
@@ -34,11 +32,7 @@ export default function CreateTaskModal({
   const [loadingMembers, setLoadingMembers] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchMembers();
-  }, []);
-
-  const fetchMembers = async () => {
+  const fetchMembers = useCallback(async () => {
     try {
       setLoadingMembers(true);
       const response = await fetch(`${API_URL}/projects/${projectId}/members`, {
@@ -59,7 +53,11 @@ export default function CreateTaskModal({
     } finally {
       setLoadingMembers(false);
     }
-  };
+  }, [projectId, user?.id]);
+
+  useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -111,7 +109,7 @@ export default function CreateTaskModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div className="flex fixed inset-0 z-50 justify-center items-center p-4 bg-black bg-opacity-50">
       <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-lg dark:bg-gray-900">
         <div className="sticky top-0 p-6 bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-800">
           <div className="flex justify-between items-center">
