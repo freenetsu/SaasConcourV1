@@ -4,7 +4,6 @@ import type { Appointment } from "../../api/mock-appointments";
 import { getUserAppointments } from "../../api/mock-appointments";
 import { getAllProjects } from "../../api/mock-projects";
 import PageMeta from "../../components/common/PageMeta";
-import { API_URL } from "../../config/api";
 import { useAuth } from "../../context/AuthContext";
 import type { Project } from "../../types/project";
 
@@ -13,30 +12,12 @@ export default function Home() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [apiTest, setApiTest] = useState<string>("Testing API...");
 
   useEffect(() => {
     const loadData = async () => {
       if (!user) return;
       setLoading(true);
       try {
-        // Test API call
-        console.log("🔍 Testing API at:", API_URL);
-        setApiTest(`Testing API at: ${API_URL}`);
-
-        const testResponse = await fetch(`${API_URL}/projects`, {
-          headers: {
-            "x-user-id": user.id,
-          },
-        });
-
-        console.log("📦 API Response status:", testResponse.status);
-        const testData = await testResponse.json();
-        console.log("📦 API Response data:", testData);
-        setApiTest(
-          `API Status: ${testResponse.status} - Projects: ${testData.projects?.length || 0}`
-        );
-
         const [appointmentsData, projectsData] = await Promise.all([
           getUserAppointments(user.id),
           getAllProjects(user.id, user.role),
@@ -44,10 +25,7 @@ export default function Home() {
         setAppointments(appointmentsData);
         setProjects(projectsData);
       } catch (error) {
-        console.error("❌ Erreur lors du chargement des données:", error);
-        setApiTest(
-          `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-        );
+        console.error("Erreur lors du chargement des données:", error);
       } finally {
         setLoading(false);
       }
@@ -103,12 +81,6 @@ export default function Home() {
         <p className="text-gray-500 dark:text-gray-400">
           Voici un aperçu de votre activité
         </p>
-        {/* API Test Debug */}
-        <div className="mt-2 p-3 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
-          <p className="text-sm font-mono text-yellow-800 dark:text-yellow-200">
-            🔍 API Test: {apiTest}
-          </p>
-        </div>
       </div>
 
       {/* Métriques principales */}
