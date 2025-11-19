@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import ChatBox from "../../components/chat/ChatBox";
 import PageMeta from "../../components/common/PageMeta";
@@ -53,21 +53,7 @@ export default function ProjectDetail() {
   const navigate = useNavigate();
   const { project, loading, error } = useProject(id || "");
   const { user } = useAuth();
-  const [stats, setStats] = useState<{
-    total: number;
-    todo: number;
-    inProgress: number;
-    review: number;
-    done: number;
-    progress: number;
-  } | null>(null);
   const [activeTab, setActiveTab] = useState<"tasks" | "chat">("tasks");
-
-  useEffect(() => {
-    if (project?.id) {
-      getProjectStats(project.id).then(setStats);
-    }
-  }, [project]);
 
   if (loading) {
     return (
@@ -128,10 +114,22 @@ export default function ProjectDetail() {
     }
 
     try {
-      await deleteProject(id || "");
+      const response = await fetch(`${API_URL}/projects/${id}`, {
+        method: "DELETE",
+        headers: {
+          "x-user-id": user?.id || "",
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Erreur lors de la suppression");
+      }
+
       navigate("/projects");
-    } catch {
-      alert("Erreur lors de la suppression du projet");
+    } catch (err) {
+      const error = err as Error;
+      alert(error.message || "Erreur lors de la suppression du projet");
     }
   };
 
@@ -196,115 +194,6 @@ export default function ProjectDetail() {
                 )}
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-6 mb-6 md:grid-cols-4">
-          {/* Progression */}
-          <div className="p-4 sm:p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                Progression
-              </span>
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 text-brand-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
-            </div>
-            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-              {stats?.progress || 0}%
-            </div>
-            <div className="mt-2 sm:mt-3 w-full h-2 bg-gray-200 rounded-full dark:bg-gray-800">
-              <div
-                className="h-2 rounded-full transition-all bg-brand-500"
-                style={{ width: `${stats?.progress || 0}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Total tâches */}
-          <div className="p-4 sm:p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                Total tâches
-              </span>
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                />
-              </svg>
-            </div>
-            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-              {stats?.total || 0}
-            </div>
-          </div>
-
-          {/* En cours */}
-          <div className="p-4 sm:p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                En cours
-              </span>
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-              {stats?.inProgress || 0}
-            </div>
-          </div>
-
-          {/* Terminées */}
-          <div className="p-4 sm:p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                Terminées
-              </span>
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 text-green-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-              {stats?.done || 0}
-            </div>
           </div>
         </div>
 
