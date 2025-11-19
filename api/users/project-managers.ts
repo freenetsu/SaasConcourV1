@@ -36,17 +36,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const userId = getUserFromRequest(req);
+    console.log("🔍 [project-managers] userId:", userId);
 
     if (!userId) {
       return res.status(401).json({ error: "Non authentifié" });
     }
 
     const userRole = await getUserRole(userId);
+    console.log("🔍 [project-managers] userRole:", userRole);
 
     // Seul ADMIN peut voir la liste des PROJECT_MANAGER
     if (userRole !== "ADMIN") {
+      console.log(
+        "❌ [project-managers] Access denied. Role is:",
+        userRole,
+        "Expected: ADMIN"
+      );
       return res.status(403).json({ error: "Accès refusé" });
     }
+
+    console.log("✅ [project-managers] Access granted for ADMIN");
 
     const projectManagers = await prisma.user.findMany({
       where: {
