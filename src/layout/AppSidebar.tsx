@@ -95,7 +95,13 @@ const othersItems: NavItem[] = [
 ];
 
 const AppSidebar: React.FC = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const {
+    isExpanded,
+    isMobileOpen,
+    isHovered,
+    setIsHovered,
+    toggleMobileSidebar,
+  } = useSidebar();
   const location = useLocation();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
@@ -162,6 +168,13 @@ const AppSidebar: React.FC = () => {
     });
   };
 
+  const handleLinkClick = () => {
+    // Fermer la sidebar mobile lors du clic sur un lien
+    if (isMobileOpen) {
+      toggleMobileSidebar();
+    }
+  };
+
   const renderMenuItems = (items: NavItem[], menuType: "main" | "others") => (
     <ul className="flex flex-col gap-4">
       {items.map((nav, index) => (
@@ -206,6 +219,7 @@ const AppSidebar: React.FC = () => {
             nav.path && (
               <Link
                 to={nav.path}
+                onClick={handleLinkClick}
                 className={`menu-item group ${
                   isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
                 }`}
@@ -243,6 +257,7 @@ const AppSidebar: React.FC = () => {
                   <li key={subItem.name}>
                     <Link
                       to={subItem.path}
+                      onClick={handleLinkClick}
                       className={`menu-dropdown-item ${
                         isActive(subItem.path)
                           ? "menu-dropdown-item-active"
@@ -305,7 +320,7 @@ const AppSidebar: React.FC = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link to="/">
+        <Link to="/" onClick={handleLinkClick}>
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <img

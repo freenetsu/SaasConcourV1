@@ -241,7 +241,7 @@ export default function ProjectDetail() {
         description={`Détails du projet ${project.name}`}
       />
 
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {/* Header */}
         <div className="mb-6">
           <Link
@@ -264,31 +264,31 @@ export default function ProjectDetail() {
             Retour aux projets
           </Link>
 
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
             <div className="flex-1">
-              <div className="flex gap-3 items-center mb-2">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center mb-2">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
                   {project.name}
                 </h1>
                 <StatusBadge status={project.status} />
               </div>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                 {project.description || "Aucune description"}
               </p>
             </div>
 
             {canEdit && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-shrink-0">
                 <button
                   onClick={handleEdit}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-800"
+                  className="px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
                   Modifier
                 </button>
                 {isAdmin && (
                   <button
                     onClick={handleDelete}
-                    className="px-4 py-2 text-sm font-medium text-red-600 bg-white rounded-lg border border-red-200 hover:bg-red-50 dark:bg-gray-900 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
+                    className="px-3 sm:px-4 py-2 text-sm font-medium text-red-600 bg-white rounded-lg border border-red-200 hover:bg-red-50 dark:bg-gray-900 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
                   >
                     Supprimer
                   </button>
@@ -299,15 +299,15 @@ export default function ProjectDetail() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 gap-6 mb-6 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-6 mb-6 md:grid-cols-4">
           {/* Progression */}
-          <div className="p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
+          <div className="p-4 sm:p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                 Progression
               </span>
               <svg
-                className="w-5 h-5 text-brand-500"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-brand-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -320,10 +320,10 @@ export default function ProjectDetail() {
                 />
               </svg>
             </div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
               {stats?.progress || 0}%
             </div>
-            <div className="mt-3 w-full h-2 bg-gray-200 rounded-full dark:bg-gray-800">
+            <div className="mt-2 sm:mt-3 w-full h-2 bg-gray-200 rounded-full dark:bg-gray-800">
               <div
                 className="h-2 rounded-full transition-all bg-brand-500"
                 style={{ width: `${stats?.progress || 0}%` }}
@@ -332,13 +332,13 @@ export default function ProjectDetail() {
           </div>
 
           {/* Total tâches */}
-          <div className="p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
+          <div className="p-4 sm:p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                 Total tâches
               </span>
               <svg
-                className="w-5 h-5 text-blue-500"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -351,19 +351,19 @@ export default function ProjectDetail() {
                 />
               </svg>
             </div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
               {stats?.total || 0}
             </div>
           </div>
 
           {/* En cours */}
-          <div className="p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
+          <div className="p-4 sm:p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                 En cours
               </span>
               <svg
-                className="w-5 h-5 text-yellow-500"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -376,19 +376,19 @@ export default function ProjectDetail() {
                 />
               </svg>
             </div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
               {stats?.inProgress || 0}
             </div>
           </div>
 
           {/* Terminées */}
-          <div className="p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
+          <div className="p-4 sm:p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                 Terminées
               </span>
               <svg
-                className="w-5 h-5 text-green-500"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-green-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -401,15 +401,15 @@ export default function ProjectDetail() {
                 />
               </svg>
             </div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
               {stats?.done || 0}
             </div>
           </div>
         </div>
 
         {/* Infos projet */}
-        <div className="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-3">
-          <div className="p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 mb-6 lg:grid-cols-3">
+          <div className="p-4 sm:p-6 bg-white rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
             <h3 className="mb-4 text-sm font-medium text-gray-500 uppercase dark:text-gray-400">
               Informations
             </h3>
@@ -444,7 +444,7 @@ export default function ProjectDetail() {
           </div>
 
           {/* Membres du projet */}
-          <div className="p-6 bg-white rounded-xl border border-gray-200 lg:col-span-2 dark:bg-gray-900 dark:border-gray-800">
+          <div className="p-4 sm:p-6 bg-white rounded-xl border border-gray-200 lg:col-span-2 dark:bg-gray-900 dark:border-gray-800">
             <h3 className="mb-4 text-sm font-medium text-gray-500 uppercase dark:text-gray-400">
               Membres de l'équipe ({members.length})
             </h3>
@@ -452,21 +452,23 @@ export default function ProjectDetail() {
               {members.map((member) => (
                 <div
                   key={member.id}
-                  className="flex gap-3 items-center p-3 rounded-lg border border-gray-100 dark:border-gray-800"
+                  className="p-3 sm:p-4 bg-white rounded-lg border border-gray-200 dark:bg-gray-900 dark:border-gray-800"
                 >
-                  <div className="flex flex-shrink-0 justify-center items-center w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/20">
-                    <span className="text-sm font-medium text-brand-600 dark:text-brand-400">
-                      {member.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                      {member.name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {member.role} • {member.tasksCount} tâche
-                      {member.tasksCount > 1 ? "s" : ""}
-                    </p>
+                  <div className="flex gap-3 items-center mb-2">
+                    <div className="flex flex-shrink-0 justify-center items-center w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/20">
+                      <span className="text-sm font-medium text-brand-600 dark:text-brand-400">
+                        {member.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
+                        {member.name}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {member.role} • {member.tasksCount} tâche
+                        {member.tasksCount > 1 ? "s" : ""}
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -475,11 +477,11 @@ export default function ProjectDetail() {
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 border-b border-gray-200 dark:border-gray-800">
-          <nav className="flex gap-8">
+        <div className="mb-6 border-b border-gray-200 dark:border-gray-800 overflow-x-auto">
+          <nav className="flex gap-4 sm:gap-8 min-w-max">
             <button
               onClick={() => setActiveTab("tasks")}
-              className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
+              className={`pb-3 sm:pb-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "tasks"
                   ? "border-brand-500 text-brand-600 dark:text-brand-400"
                   : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -489,7 +491,7 @@ export default function ProjectDetail() {
             </button>
             <button
               onClick={() => setActiveTab("members")}
-              className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
+              className={`pb-3 sm:pb-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "members"
                   ? "border-brand-500 text-brand-600 dark:text-brand-400"
                   : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -499,7 +501,7 @@ export default function ProjectDetail() {
             </button>
             <button
               onClick={() => setActiveTab("chat")}
-              className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
+              className={`pb-3 sm:pb-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === "chat"
                   ? "border-brand-500 text-brand-600 dark:text-brand-400"
                   : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -523,26 +525,26 @@ export default function ProjectDetail() {
               project.tasks.map((task) => (
                 <div
                   key={task.id}
-                  className="p-4 bg-white rounded-lg border border-gray-200 dark:bg-gray-900 dark:border-gray-800"
+                  className="p-3 sm:p-4 bg-white rounded-lg border border-gray-200 dark:bg-gray-900 dark:border-gray-800"
                 >
-                  <div className="flex justify-between items-start mb-2">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 dark:text-white">
+                      <h4 className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">
                         {task.title}
                       </h4>
                       {task.description && (
-                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                           {task.description}
                         </p>
                       )}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-shrink-0">
                       <TaskStatusBadge status={task.status} />
                       <PriorityBadge priority={task.priority} />
                     </div>
                   </div>
 
-                  <div className="flex gap-4 items-center mt-3 text-sm">
+                  <div className="flex flex-wrap gap-3 sm:gap-4 items-center mt-3 text-xs sm:text-sm">
                     {task.assignee && (
                       <div className="flex gap-2 items-center">
                         <div className="flex justify-center items-center w-6 h-6 rounded-full bg-brand-100 dark:bg-brand-900/20">
@@ -585,11 +587,11 @@ export default function ProjectDetail() {
             )}
           </div>
         ) : activeTab === "members" ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {members.map((member) => (
               <div
                 key={member.id}
-                className="p-6 bg-white rounded-lg border border-gray-200 dark:bg-gray-900 dark:border-gray-800"
+                className="p-4 sm:p-6 bg-white rounded-lg border border-gray-200 dark:bg-gray-900 dark:border-gray-800"
               >
                 <div className="flex gap-4 items-center mb-4">
                   <div className="flex flex-shrink-0 justify-center items-center w-12 h-12 rounded-full bg-brand-100 dark:bg-brand-900/20">

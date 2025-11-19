@@ -235,16 +235,16 @@ const Calendar: React.FC = () => {
         title="Mon Calendrier | TailAdmin"
         description="Gérez votre emploi du temps et vos événements de travail"
       />
-      <div className="rounded-2xl border  border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+      <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
         <div className="custom-calendar">
           <FullCalendar
             ref={calendarRef}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="timeGridWeek"
             headerToolbar={{
-              left: "prev,next today addEventButton",
+              left: "prev,next today",
               center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay",
+              right: "addEventButton,dayGridMonth,timeGridWeek,timeGridDay",
             }}
             slotMinTime="08:00:00"
             slotMaxTime="19:00:00"
@@ -286,14 +286,14 @@ const Calendar: React.FC = () => {
         <Modal
           isOpen={isOpen}
           onClose={closeModal}
-          className="max-w-[700px] p-6 lg:p-10"
+          className="max-w-[700px] p-4 sm:p-6 lg:p-10 max-h-[90vh]"
         >
-          <div className="flex overflow-y-auto flex-col px-2 custom-scrollbar">
+          <div className="flex overflow-y-auto flex-col px-2 custom-scrollbar max-h-[calc(90vh-2rem)]">
             <div>
-              <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl">
+              <h5 className="mb-2 font-semibold text-gray-800 modal-title text-lg sm:text-xl dark:text-white/90 lg:text-2xl">
                 {selectedEvent ? "Modifier l'événement" : "Nouvel événement"}
               </h5>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 Organisez votre emploi du temps et planifiez vos activités
               </p>
             </div>
@@ -333,20 +333,22 @@ const Calendar: React.FC = () => {
                 <label className="block mb-4 text-sm font-medium text-gray-700 dark:text-gray-400">
                   Type d'événement <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-3">
                   {Object.entries(eventTypeConfig).map(([key, config]) => (
                     <button
                       key={key}
                       type="button"
                       onClick={() => setEventType(key as EventType)}
-                      className={`flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                      className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 sm:py-3 rounded-lg border-2 transition-all ${
                         eventType === key
                           ? "border-brand-500 bg-brand-50 dark:bg-brand-900/20"
                           : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
                       }`}
                     >
-                      <span className="text-xl">{config.icon}</span>
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <span className="text-base sm:text-xl">
+                        {config.icon}
+                      </span>
+                      <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
                         {config.label}
                       </span>
                     </button>
@@ -374,7 +376,7 @@ const Calendar: React.FC = () => {
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Début <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input
                     id="event-start-date"
                     type="date"
@@ -401,7 +403,7 @@ const Calendar: React.FC = () => {
                 <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Fin <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input
                     id="event-end-date"
                     type="date"
@@ -423,12 +425,12 @@ const Calendar: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="flex gap-3 items-center mt-6 modal-footer sm:justify-end">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center mt-6 modal-footer sm:justify-end">
               {selectedEvent && (
                 <button
                   onClick={handleDeleteEvent}
                   type="button"
-                  className="flex w-full justify-center rounded-lg border border-red-300 bg-white px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-red-900/20 sm:w-auto"
+                  className="flex w-full sm:w-auto justify-center rounded-lg border border-red-300 bg-white px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-red-900/20 order-3 sm:order-1"
                 >
                   Supprimer
                 </button>
@@ -436,14 +438,14 @@ const Calendar: React.FC = () => {
               <button
                 onClick={closeModal}
                 type="button"
-                className="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto"
+                className="flex w-full sm:w-auto justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] order-2"
               >
                 Annuler
               </button>
               <button
                 onClick={handleAddOrUpdateEvent}
                 type="button"
-                className="btn btn-success btn-update-event flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto"
+                className="btn btn-success btn-update-event flex w-full sm:w-auto justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 order-1 sm:order-3"
               >
                 {selectedEvent ? "Enregistrer" : "Créer"}
               </button>
