@@ -60,13 +60,44 @@ export function useProject(projectId: string) {
       try {
         setLoading(true);
 
-        const response = await fetch(`${API_URL}/projects/${projectId}`, {
+        const url = `${API_URL}/projects/${projectId}`;
+        console.log("🔍 Fetching project:", {
+          url,
+          projectId,
+          userId: user.id,
+          API_URL,
+        });
+
+        const response = await fetch(url, {
           headers: {
             "x-user-id": user.id,
           },
         });
 
-        const data = await response.json();
+        console.log("📦 Response status:", response.status);
+        console.log(
+          "📦 Response headers:",
+          Object.fromEntries(response.headers.entries())
+        );
+
+        // Lire le texte brut d'abord pour voir ce qui est retourné
+        const textResponse = await response.text();
+        console.log(
+          "📦 Raw response (first 200 chars):",
+          textResponse.substring(0, 200)
+        );
+
+        let data;
+        try {
+          data = JSON.parse(textResponse);
+          console.log("✅ Parsed JSON:", data);
+        } catch (parseError) {
+          console.error("❌ JSON Parse Error:", parseError);
+          console.error("❌ Response was:", textResponse);
+          throw new Error(
+            `Invalid JSON response: ${textResponse.substring(0, 100)}`
+          );
+        }
 
         if (!response.ok) {
           throw new Error(data.error || "Erreur lors du chargement du projet");
@@ -77,7 +108,7 @@ export function useProject(projectId: string) {
       } catch (err) {
         const error = err as Error;
         setError(error.message || "Erreur lors du chargement du projet");
-        console.error(err);
+        console.error("❌ Full error:", err);
       } finally {
         setLoading(false);
       }
