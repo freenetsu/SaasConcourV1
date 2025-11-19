@@ -312,7 +312,7 @@ export default function EditProject() {
                       value={formData.startDate}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg dark:border-gray-800 dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg dark:border-gray-800 dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:dark:invert"
                     />
                   </div>
 
@@ -330,7 +330,7 @@ export default function EditProject() {
                       name="endDate"
                       value={formData.endDate}
                       onChange={handleChange}
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg dark:border-gray-800 dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg dark:border-gray-800 dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:dark:invert"
                     />
                   </div>
                 </div>
