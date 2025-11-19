@@ -93,9 +93,10 @@ model Project {
   updatedAt        DateTime      @updatedAt
 
   // Relations
-  projectManager User   @relation("ProjectManager", fields: [projectManagerId], references: [id], onDelete: Cascade)
-  members        User[] @relation("ProjectMembers") // Membres du projet
-  tasks          Task[] @relation("ProjectTasks")
+  projectManager User          @relation("ProjectManager", fields: [projectManagerId], references: [id], onDelete: Cascade)
+  members        User[]         @relation("ProjectMembers") // Membres du projet
+  tasks          Task[]         @relation("ProjectTasks")
+  appointments   Appointment[]  @relation("ProjectAppointments") // Rendez-vous liés au projet
 
   @@index([projectManagerId])
   @@index([status])
@@ -174,16 +175,19 @@ model Appointment {
   startDate   DateTime
   endDate     DateTime
   location    String?
-  clientId    String
+  clientId    String?           // Optionnel si lié à un projet
+  projectId   String?           // Optionnel - lien avec un projet
   userId      String
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
   // Relations
-  client Client @relation("ClientAppointments", fields: [clientId], references: [id], onDelete: Cascade)
-  user   User   @relation("UserAppointments", fields: [userId], references: [id], onDelete: Cascade)
+  client  Client?  @relation("ClientAppointments", fields: [clientId], references: [id], onDelete: Cascade)
+  project Project? @relation("ProjectAppointments", fields: [projectId], references: [id], onDelete: Cascade)
+  user    User     @relation("UserAppointments", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([clientId])
+  @@index([projectId])
   @@index([userId])
   @@index([startDate])
   @@index([status])

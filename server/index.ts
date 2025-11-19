@@ -1,6 +1,8 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
+import appointmentRoutes from "./routes/appointments";
 import authRoutes from "./routes/auth";
+import clientRoutes from "./routes/clients";
 import projectMembersRoutes from "./routes/project-members";
 import projectRoutes from "./routes/projects";
 import taskRoutes from "./routes/tasks";
@@ -20,6 +22,8 @@ app.use("/api/projects", projectMembersRoutes); // Routes pour les membres
 app.use("/api/projects", taskRoutes); // Routes pour les tâches
 app.use("/api/tasks", taskRoutes); // Routes pour les tâches (modification/suppression)
 app.use("/api/users", userRoutes);
+app.use("/api/clients", clientRoutes); // Routes pour les clients
+app.use("/api/appointments", appointmentRoutes); // Routes pour les rendez-vous
 
 // Health check
 app.get("/api/health", (req: Request, res: Response) => {
