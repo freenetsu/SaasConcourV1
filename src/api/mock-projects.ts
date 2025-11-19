@@ -1,5 +1,5 @@
 // Mock data pour les projets (simulation sans backend)
-import type { Project } from "./projects";
+import type { Project } from "../types/project";
 
 // Données de test simulées (mutable pour permettre l'ajout)
 let mockProjects: Project[] = [
@@ -228,12 +228,12 @@ let mockProjects: Project[] = [
 // Simuler les appels API
 export async function getAllProjects(
   userId: string,
-  userRole: "ADMIN" | "USER"
+  userRole: "ADMIN" | "PROJECT_MANAGER" | "USER"
 ): Promise<Project[]> {
   // Simuler un délai réseau
   await new Promise((resolve) => setTimeout(resolve, 500));
 
-  if (userRole === "ADMIN") {
+  if (userRole === "ADMIN" || userRole === "PROJECT_MANAGER") {
     return mockProjects;
   }
 

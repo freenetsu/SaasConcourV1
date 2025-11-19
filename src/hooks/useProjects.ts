@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import type { Project } from "../api/projects";
 import { API_URL } from "../config/api";
 import { useAuth } from "../context/AuthContext";
+import type { Project } from "../types/project";
 
 export function useProjects() {
   const [projects, setProjects] = useState<Project[]>([]);

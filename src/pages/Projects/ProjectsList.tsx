@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import type { Project } from "../../api/projects";
 import PageMeta from "../../components/common/PageMeta";
 import { useAuth } from "../../context/AuthContext";
 import { useProjects } from "../../hooks/useProjects";
+import type { Project } from "../../types/project";
 
 // Composant pour le badge de statut
 const StatusBadge = ({ status }: { status: string }) => {

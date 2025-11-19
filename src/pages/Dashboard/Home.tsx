@@ -3,9 +3,9 @@ import { Link } from "react-router";
 import type { Appointment } from "../../api/mock-appointments";
 import { getUserAppointments } from "../../api/mock-appointments";
 import { getAllProjects } from "../../api/mock-projects";
-import type { Project } from "../../api/projects";
 import PageMeta from "../../components/common/PageMeta";
 import { useAuth } from "../../context/AuthContext";
+import type { Project } from "../../types/project";
 
 export default function Home() {
   const { user } = useAuth();
