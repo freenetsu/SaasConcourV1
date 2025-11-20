@@ -476,8 +476,8 @@ export default function Appointments() {
 
       {/* Modal de création */}
       {showModal && (
-        <div className="flex fixed inset-0 z-50 justify-center items-center p-4 bg-black/50">
-          <div className="w-full max-w-2xl rounded-lg bg-white dark:bg-gray-900 shadow-xl max-h-[90vh] overflow-y-auto">
+        <div className="flex fixed inset-0 z-[9999] justify-center items-center p-4 bg-black/50">
+          <div className="w-full max-w-2xl rounded-lg bg-white dark:bg-gray-900 shadow-xl max-h-[90vh] overflow-y-auto relative">
             <div className="p-6 border-b border-gray-200 dark:border-gray-800">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 Nouveau rendez-vous
