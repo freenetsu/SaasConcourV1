@@ -15,6 +15,11 @@ export function useProjects() {
     const fetchProjects = async () => {
       try {
         setLoading(true);
+        console.log(
+          "🔍 [useProjects] Fetching projects from:",
+          `${API_URL}/projects`
+        );
+        console.log("🔍 [useProjects] User ID:", user.id);
 
         const response = await fetch(`${API_URL}/projects`, {
           headers: {
@@ -22,7 +27,10 @@ export function useProjects() {
           },
         });
 
+        console.log("📦 [useProjects] Response status:", response.status);
+
         const data = await response.json();
+        console.log("📦 [useProjects] Response data:", data);
 
         if (!response.ok) {
           throw new Error(
@@ -34,8 +42,8 @@ export function useProjects() {
         setError(null);
       } catch (err) {
         const error = err as Error;
-        setError(error.message || "Erreur lors du chargement des projets");
-        console.error(err);
+        console.error("❌ [useProjects] Error:", err);
+        setError(error.message || "Failed to fetch");
       } finally {
         setLoading(false);
       }
