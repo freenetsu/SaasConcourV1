@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import type { Appointment } from "../../api/mock-appointments";
-import { getUserAppointments } from "../../api/mock-appointments";
-import { getAllProjects } from "../../api/mock-projects";
 import PageMeta from "../../components/common/PageMeta";
+import { API_URL } from "../../config/api";
 import { useAuth } from "../../context/AuthContext";
 import type { Project } from "../../types/project";
+
+interface Appointment {
+  id: string;
+  title: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  status: string;
+}
 
 export default function Home() {
   const { user } = useAuth();
@@ -18,12 +25,20 @@ export default function Home() {
       if (!user) return;
       setLoading(true);
       try {
-        const [appointmentsData, projectsData] = await Promise.all([
-          getUserAppointments(user.id),
-          getAllProjects(user.id, user.role),
+        const [appointmentsRes, projectsRes] = await Promise.all([
+          fetch(`${API_URL}/appointments`, {
+            headers: { "x-user-id": user.id },
+          }),
+          fetch(`${API_URL}/projects`, {
+            headers: { "x-user-id": user.id },
+          }),
         ]);
-        setAppointments(appointmentsData);
-        setProjects(projectsData);
+
+        const appointmentsData = await appointmentsRes.json();
+        const projectsData = await projectsRes.json();
+
+        setAppointments(appointmentsData.appointments || []);
+        setProjects(projectsData.projects || []);
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
       } finally {

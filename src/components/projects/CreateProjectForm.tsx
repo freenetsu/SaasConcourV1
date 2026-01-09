@@ -36,25 +36,31 @@ export default function CreateProjectForm() {
       navigate("/projects");
       return;
     }
-    fetchProjectManagers();
-  }, [canCreate, navigate]);
 
-  const fetchProjectManagers = async () => {
-    try {
-      // TODO: Créer une API pour récupérer les PROJECT_MANAGER
-      // Pour l'instant, on simule
-      setProjectManagers([
-        {
-          id: user?.id || "",
-          name: user?.name || "",
-          email: user?.email || "",
-          role: "ADMIN",
-        },
-      ]);
-    } catch (err) {
-      console.error("Error fetching project managers:", err);
-    }
-  };
+    const fetchProjectManagers = async () => {
+      try {
+        if (!user) return;
+
+        const response = await fetch(`${API_URL}/users/project-managers`, {
+          headers: {
+            "x-user-id": user.id,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch project managers");
+        }
+
+        const data = await response.json();
+        setProjectManagers(data.users || []);
+      } catch (err) {
+        console.error("Error fetching project managers:", err);
+        setProjectManagers([]);
+      }
+    };
+
+    fetchProjectManagers();
+  }, [canCreate, navigate, user]);
 
   const handleChange = (
     e: React.ChangeEvent<
