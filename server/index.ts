@@ -3,6 +3,8 @@ import express, { Request, Response } from "express";
 import appointmentRoutes from "./routes/appointments";
 import authRoutes from "./routes/auth";
 import clientRoutes from "./routes/clients";
+import eventsRoutes from "./routes/events";
+import googleRoutes from "./routes/google";
 import projectMembersRoutes from "./routes/project-members";
 import projectRoutes from "./routes/projects";
 import taskRoutes from "./routes/tasks";
@@ -24,6 +26,8 @@ app.use("/api/tasks", taskRoutes); // Routes pour les tâches (modification/supp
 app.use("/api/users", userRoutes);
 app.use("/api/clients", clientRoutes); // Routes pour les clients
 app.use("/api/appointments", appointmentRoutes); // Routes pour les rendez-vous
+app.use("/api/events", eventsRoutes); // Routes pour les événements
+app.use("/api/google", googleRoutes); // Routes pour Google Calendar OAuth
 
 // Health check
 app.get("/api/health", (req: Request, res: Response) => {

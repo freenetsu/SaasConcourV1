@@ -89,7 +89,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
             />
           </svg>
           <span className="text-gray-600 dark:text-gray-400">
-            {project._count?.tasks || 0} tâches
+            {project.tasks?.length || 0} tâches
           </span>
         </div>
         <div className="flex items-center gap-1.5">

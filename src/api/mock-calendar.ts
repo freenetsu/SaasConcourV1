@@ -26,49 +26,77 @@ export interface CalendarEvent {
   updatedAt: Date;
 }
 
-// Configuration des types d'événements
-export const eventTypeConfig = {
+// Google Calendar inspired color palette
+export const eventTypeConfig: Record<string, { label: string; icon: string; color: string; bgColor: string; darkBgColor: string }> = {
   meeting: {
     label: "Réunion",
-    icon: "🎯",
-    color: "#EF4444", // red-500
-    bgColor: "#FEE2E2", // red-100
-    darkBgColor: "#7F1D1D", // red-900
+    icon: "👥",
+    color: "#d50000",
+    bgColor: "#f28b82",
+    darkBgColor: "#c53929",
   },
   development: {
     label: "Développement",
     icon: "💻",
-    color: "#3B82F6", // blue-500
-    bgColor: "#DBEAFE", // blue-100
-    darkBgColor: "#1E3A8A", // blue-900
+    color: "#039be5",
+    bgColor: "#7cb6f8",
+    darkBgColor: "#0277bd",
   },
   task: {
     label: "Tâche",
-    icon: "📋",
-    color: "#10B981", // green-500
-    bgColor: "#D1FAE5", // green-100
-    darkBgColor: "#064E3B", // green-900
+    icon: "✓",
+    color: "#0b8043",
+    bgColor: "#57bb8a",
+    darkBgColor: "#1b5e20",
   },
   break: {
     label: "Pause",
-    icon: "🍽️",
-    color: "#6B7280", // gray-500
-    bgColor: "#F3F4F6", // gray-100
-    darkBgColor: "#374151", // gray-700
+    icon: "☕",
+    color: "#616161",
+    bgColor: "#a8a8a8",
+    darkBgColor: "#424242",
   },
   training: {
     label: "Formation",
-    icon: "🎓",
-    color: "#8B5CF6", // violet-500
-    bgColor: "#EDE9FE", // violet-100
-    darkBgColor: "#5B21B6", // violet-900
+    icon: "📚",
+    color: "#8e24aa",
+    bgColor: "#b39ddb",
+    darkBgColor: "#6a1b9a",
   },
   unavailable: {
     label: "Indisponible",
-    icon: "🚫",
-    color: "#F59E0B", // amber-500
-    bgColor: "#FEF3C7", // amber-100
-    darkBgColor: "#78350F", // amber-900
+    icon: "⛔",
+    color: "#f4511e",
+    bgColor: "#ffab91",
+    darkBgColor: "#d84315",
+  },
+  MEETING: {
+    label: "Réunion",
+    icon: "👥",
+    color: "#d50000",
+    bgColor: "#f28b82",
+    darkBgColor: "#c53929",
+  },
+  DEADLINE: {
+    label: "Échéance",
+    icon: "⏰",
+    color: "#e67c73",
+    bgColor: "#f28b82",
+    darkBgColor: "#c53929",
+  },
+  REMINDER: {
+    label: "Rappel",
+    icon: "🔔",
+    color: "#f6bf26",
+    bgColor: "#fdd663",
+    darkBgColor: "#f9a825",
+  },
+  OTHER: {
+    label: "Autre",
+    icon: "📅",
+    color: "#7986cb",
+    bgColor: "#aab6fe",
+    darkBgColor: "#5c6bc0",
   },
 };
 

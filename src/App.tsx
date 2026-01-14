@@ -2,7 +2,9 @@ import { Route, BrowserRouter as Router, Routes } from "react-router";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import { AuthProvider } from "./context/AuthContext";
+import { GoogleCalendarProvider } from "./context/GoogleCalendarContext";
 import AppLayout from "./layout/AppLayout";
+import GoogleCallback from "./pages/GoogleCallback";
 import Appointments from "./pages/Appointments";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
@@ -29,9 +31,10 @@ import UserProfiles from "./pages/UserProfiles";
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
-        <ScrollToTop />
-        <Routes>
+      <GoogleCalendarProvider>
+        <Router>
+          <ScrollToTop />
+          <Routes>
           {/* Dashboard Layout - Protected */}
           <Route
             path="/"
@@ -78,10 +81,14 @@ export default function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
 
+          {/* Google OAuth Callback */}
+          <Route path="/auth/google/callback" element={<GoogleCallback />} />
+
           {/* Fallback Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </Router>
+        </Router>
+      </GoogleCalendarProvider>
     </AuthProvider>
   );
 }

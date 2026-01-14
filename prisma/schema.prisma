@@ -45,6 +45,11 @@ enum TaskPriority {
 // Enumération pour le type d'événement
 enum EventType {
   MEETING
+  DEVELOPMENT
+  TASK
+  BREAK
+  TRAINING
+  UNAVAILABLE
   DEADLINE
   REMINDER
   OTHER
@@ -58,6 +63,14 @@ enum AppointmentStatus {
   COMPLETED
 }
 
+// Enumération pour le statut de synchronisation Google Calendar
+enum SyncStatus {
+  LOCAL        // Événement créé localement, pas encore synchronisé
+  SYNCED       // Synchronisé avec Google Calendar
+  CONFLICT     // Conflit détecté (modifications concurrentes)
+  GOOGLE_ONLY  // Événement venant de Google Calendar uniquement
+}
+
 // Modèle User - Utilisateurs de l'application
 model User {
   id        String   @id @default(cuid())
@@ -69,11 +82,12 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  managedProjects Project[]     @relation("ProjectManager") // Projets gérés par cet utilisateur
-  memberProjects  Project[]     @relation("ProjectMembers") // Projets dont cet utilisateur est membre
-  assignedTasks   Task[]        @relation("TaskAssignee") // Tâches assignées à cet utilisateur
-  events          Event[]       @relation("UserEvents") // Événements de planning de cet utilisateur
-  appointments    Appointment[] @relation("UserAppointments") // Rendez-vous de cet utilisateur
+  managedProjects      Project[]             @relation("ProjectManager") // Projets gérés par cet utilisateur
+  memberProjects       Project[]             @relation("ProjectMembers") // Projets dont cet utilisateur est membre
+  assignedTasks        Task[]                @relation("TaskAssignee") // Tâches assignées à cet utilisateur
+  events               Event[]               @relation("UserEvents") // Événements de planning de cet utilisateur
+  appointments         Appointment[]         @relation("UserAppointments") // Rendez-vous de cet utilisateur
+  googleCalendarSync   GoogleCalendarSync?   @relation("UserGoogleSync") // Configuration Google Calendar
 
   @@index([email])
   @@index([role])
@@ -129,21 +143,26 @@ model Task {
 
 // Modèle Event - Événements de planning interne
 model Event {
-  id          String    @id @default(cuid())
-  title       String
-  description String?   @db.Text
-  type        EventType @default(OTHER)
-  startDate   DateTime
-  endDate     DateTime
-  userId      String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String      @id @default(cuid())
+  title          String
+  description    String?     @db.Text
+  type           EventType   @default(OTHER)
+  startDate      DateTime
+  endDate        DateTime
+  userId         String
+  googleEventId  String?     @unique // ID de l'événement dans Google Calendar
+  syncStatus     SyncStatus  @default(LOCAL) // Statut de synchronisation
+  lastSyncedAt   DateTime?   // Dernière synchronisation réussie
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   // Relations
   user User @relation("UserEvents", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([startDate])
+  @@index([googleEventId])
+  @@index([syncStatus])
   @@map("events")
 }
 
@@ -192,4 +211,23 @@ model Appointment {
   @@index([startDate])
   @@index([status])
   @@map("appointments")
+}
+
+// Modèle GoogleCalendarSync - Configuration de synchronisation Google Calendar
+model GoogleCalendarSync {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  syncToken     String?   @db.Text // Token pour synchronisation incrémentale
+  calendarId    String    @default("primary") // ID du calendrier Google
+  accessToken   String?   @db.Text // Token OAuth (à chiffrer en production)
+  refreshToken  String?   @db.Text // Refresh token OAuth
+  tokenExpiry   DateTime? // Expiration du token
+  lastSyncAt    DateTime  @updatedAt
+  createdAt     DateTime  @default(now())
+
+  // Relations
+  user User @relation("UserGoogleSync", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("google_calendar_sync")
 }
